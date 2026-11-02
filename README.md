@@ -1,88 +1,60 @@
 # shade·studio
 
-> Uma cor. Oito profundidades.
+Uma cor. Oito tons de sombra.
+
+Um gerador de escalas de cores que funciona direto no navegador. Você escolhe uma cor, ajusta a intensidade e recebe oito tons mais escuros, prontos para usar no seu projeto.
+
+Tudo em um único arquivo HTML, sem instalação, npm ou processo de build.
 
 ![Arquivo único](https://img.shields.io/badge/arquivo-único-8d6c98?style=flat-square)
-![Dependências](https://img.shields.io/badge/build-nenhum-8d6c98?style=flat-square)
+![Sem build](https://img.shields.io/badge/build-nenhum-8d6c98?style=flat-square)
 ![Tema](https://img.shields.io/badge/tema-claro%20%2F%20escuro-8d6c98?style=flat-square)
 
-Gerador de paletas de sombras em **um único arquivo HTML**. Sem npm, sem build, sem backend. Você escolhe uma cor base e recebe uma escala de 8 sombras, pronta para copiar e usar.
-
 ---
 
-## A história
+## Sobre o projeto
 
-Tudo começou com uma cor: `#E8C5E6`, um lilás claro.
+A ideia surgiu ao trabalhar com a cor `#E8C5E6`. Eu precisava de tons mais escuros para usar em bordas, textos, botões e outros elementos, mas queria manter as cores consistentes.
 
-Era a cor certa para o fundo de um card, mas faltava profundidade. O texto precisava de uma versão mais escura. O botão pedia outra. A borda, outra ainda. A sombra de um ícone, mais uma.
+Em vez de ajustar cada tom manualmente, o Shade Studio gera uma escala a partir da cor escolhida. Assim, fica mais fácil manter o mesmo padrão em diferentes partes de uma interface ou em projetos diferentes.
 
-O caminho de sempre era abrir o editor de cores, arrastar o controle de luminosidade até "parecer bom" e repetir isso a cada cor nova. As escalas saíam inconsistentes de um projeto para o outro.
+## Recursos
 
-O Shade Studio faz esse passo uma vez e de forma previsível: **mesma cor base, mesma lógica, mesmo resultado**. Dá para trocar de cor, de tema ou de formato e a escala continua coerente.
-
----
-
-## O que ele faz
-
-| | |
-|---|---|
-| **8 sombras** | Da mais sutil (`Sombra 01`) à mais abissal (`Sombra 08`), numa única escala. |
-| **Qualquer formato de entrada** | HEX, RGB, HSL, HSV, CMYK ou nome CSS. Cole e pronto. |
-| **Seletor visual** | Caixa de saturação e barra de matiz, com [iro.js](https://iro.js.org). |
-| **Intensidade ajustável** | Um slider deixa a escala mais suave ou mais marcada. |
-| **Tema claro e escuro** | Segue o sistema, lembra sua escolha e anima a troca. |
-| **Contraste na hora** | Cada sombra mostra a razão de contraste e o selo AA ou AAA. |
-| **Exportação** | CSS variables, JSON ou lista de HEX, em um clique. |
-| **Prévia em contexto** | Veja as sombras aplicadas a uma interface de exemplo. |
-| **Atalhos** | `R` gera cor aleatória, `T` troca o tema, `1` a `8` copiam cada sombra. |
-
----
+- **8 tons de sombra:** do mais claro ao mais escuro.
+- **Entrada de cores:** HEX, RGB, HSL, HSV, CMYK e nomes de cores CSS.
+- **Seletor visual:** escolha a cor usando o seletor integrado do iro.js.
+- **Intensidade ajustável:** controle a diferença entre os tons.
+- **Tema claro e escuro:** alterne entre os dois modos e salve sua preferência.
+- **Verificação de contraste:** consulte a razão de contraste e os níveis WCAG AA e AAA.
+- **Exportação:** copie a escala em CSS variables, JSON ou uma lista de códigos HEX.
+- **Prévia:** veja como as cores ficam aplicadas em uma interface de exemplo.
+- **Atalhos de teclado:** gere cores aleatórias, troque o tema e copie tons sem precisar clicar em cada botão.
 
 ## Como usar
 
-1. Baixe o `shade-studio.html`.
-2. Abra no navegador (duplo clique).
-3. Escolha uma cor e copie o que precisar.
+1. Baixe o arquivo `shade-studio.html`.
+2. Abra-o no Chrome, Edge, Firefox ou outro navegador compatível.
+3. Digite uma cor ou escolha uma pelo seletor.
+4. Ajuste a intensidade e copie os tons que quiser usar.
 
-Não há nada para instalar. As únicas dependências externas, as fontes do Google Fonts e o iro.js, vêm por CDN. Sem internet, o app funciona com fontes do sistema e cai no seletor de cor nativo do navegador.
+Não é necessário instalar nada. O iro.js e as fontes do Google Fonts são carregados por CDN; se estiver sem internet, o aplicativo usa alternativas locais e o seletor nativo do navegador.
 
----
+## Como a escala funciona
 
-## Formatos aceitos
-
-Cole qualquer um destes no campo principal. A paleta atualiza enquanto você digita:
-
-```
-#E8C5E6             fff
-rgb(232, 197, 230)  232 197 230
-hsl(300, 47%, 85%)
-hsv(300, 15%, 91%)  hsb(...)
-cmyk(0%, 15%, 1%, 9%)
-hotpink
-```
-
-Abaixo do campo há abas **HEX · RGB · HSL · HSV · CMYK** com um campo por canal. Mexer em qualquer número atualiza a paleta ao vivo. O botão **copiar** leva a cor no formato da aba ativa.
-
-> Conversões entre formatos são arredondadas (1 unidade de diferença é normal). A paleta sempre usa a cor exata.
-
----
-
-## Como as sombras são calculadas
-
-A lógica é simples e previsível: **cada sombra é a cor base misturada com preto numa proporção fixa**.
+O Shade Studio escurece a cor original misturando seus valores RGB com preto. Cada nível usa uma proporção diferente, definida pela lista `FACTORS`.
 
 ```js
 const FACTORS = [.06, .13, .21, .30, .40, .51, .63, .76];
-const k = intensidade / 38;               // slider: 20 a 60, padrão 38
+const k = intensidade / 38;
 
-sombra[i] = cor_base × (1 − min(.94, FACTORS[i] × k))
+sombra[i] = cor_base * (1 - Math.min(.94, FACTORS[i] * k));
 ```
 
-Com a intensidade padrão e a base `#E8C5E6`:
+Com `#E8C5E6` e a intensidade padrão, a escala fica assim:
 
 | Nível | Nome | HEX |
 |---|---|---|
-| Base | | `#E8C5E6` |
+| Base | Original | `#E8C5E6` |
 | 01 | Sutil | `#DAB9D8` |
 | 02 | Leve | `#CAABC8` |
 | 03 | Suave | `#B79CB6` |
@@ -92,33 +64,23 @@ Com a intensidade padrão e a base `#E8C5E6`:
 | 07 | Profunda | `#564955` |
 | 08 | Abissal | `#382F37` |
 
-Os passos são mais curtos nas sombras claras e mais longos nas escuras. Assim a escala parece uniforme ao olho, e não só nos números.
+Os fatores determinam a intensidade de cada sombra. Você pode alterá-los no código para criar escalas mais suaves ou mais contrastantes.
 
----
+## Onde usar
 
-## Casos de uso
+**Interfaces:** cores para bordas, estados de hover, botões pressionados, divisores e textos secundários.
 
-**Design de interfaces**
-Gere a escala de uma cor de marca e use as sombras para hover, estados pressionados, bordas, divisores e texto secundário. Exporte como CSS variables e cole no projeto.
+**Temas escuros:** tons profundos para fundos e superfícies que mantenham a identidade da cor original.
 
-**Dark mode**
-Use as sombras profundas (05 a 08) como superfícies e fundos de um tema escuro derivado da mesma cor base.
+**Ilustrações e pixel art:** uma sequência de tons para separar luz, meio-tom e sombra.
 
-**Ilustração e pixel art**
-Cada objeto precisa de luz, meio-tom e sombra. A escala dá uma rampa consistente para sombreamento.
+**Ícones e logos:** variações de uma mesma cor para criar profundidade sem perder a identidade visual.
 
-**Ícones e logos**
-Crie variações de uma cor mantendo a identidade, para ícones com profundidade ou versões monocromáticas.
-
-**Apresentações e documentos**
-Monte uma paleta coerente a partir de uma única cor, sem sair de um tom harmônico.
-
-**Aprendizado**
-Para quem estuda cor: dá para ver o efeito de escurecer uma cor em tempo real e comparar com a conversão entre RGB, HSL, HSV e CMYK.
-
----
+**Estudos de cor:** uma forma prática de comparar valores e entender como a luminosidade muda em diferentes formatos de cor.
 
 ## Exportação
+
+A escala pode ser copiada em três formatos.
 
 **CSS variables**
 
@@ -143,60 +105,49 @@ Para quem estuda cor: dá para ver o efeito de escurecer uma cor em tempo real e
 }
 ```
 
-**Lista HEX**, um código por linha, para colar em qualquer ferramenta.
-
----
+Também é possível copiar todos os códigos HEX, um por linha.
 
 ## Atalhos
 
 | Tecla | Ação |
 |---|---|
-| `R` | Cor aleatória |
-| `T` | Alternar tema claro e escuro |
-| `1` a `8` | Copiar a sombra correspondente |
-| `Esc` | Fechar o seletor de cor |
-| `Enter` | Confirmar o campo de cor |
-
----
+| `R` | Gerar uma cor aleatória |
+| `T` | Alternar o tema |
+| `1` a `8` | Copiar um tom |
+| `Esc` | Fechar o seletor |
+| `Enter` | Confirmar a cor |
 
 ## Acessibilidade
 
-- Cada sombra escolhe sozinha texto claro ou escuro, conforme a luminância.
-- O contraste (WCAG) aparece ao passar o mouse: **AA** a partir de 4,5:1 e **AAA** a partir de 7:1.
-- Respeita `prefers-reduced-motion`: as animações são desativadas para quem pede isso.
-- Os controles têm rótulos para leitores de tela e o foco aparece de forma clara.
+- O texto de cada tom recebe uma cor clara ou escura conforme a luminância.
+- A razão de contraste pode ser consultada para verificar os critérios WCAG AA e AAA.
+- As animações respeitam a preferência `prefers-reduced-motion`.
+- Os controles possuem rótulos acessíveis e indicação visual de foco.
 
----
+## Tecnologias
 
-## Stack
+- HTML, CSS e JavaScript, sem frameworks.
+- [iro.js](https://iro.js.org) 5.5.2 para o seletor de cores.
+- Google Fonts: Manrope, DM Sans e DM Mono.
+- `localStorage` para salvar a preferência de tema.
 
-- **HTML, CSS e JavaScript puros**, sem framework e sem build
-- **[iro.js](https://iro.js.org) 5.5.2**, para o seletor de cor
-- **Google Fonts**: Manrope, DM Sans e DM Mono
-- `localStorage` para lembrar o tema
+A transição entre temas usa a View Transitions API quando disponível, com uma alternativa para navegadores que não oferecem suporte.
 
-Funciona nos navegadores atuais (Chrome, Edge, Firefox e Safari). A transição suave de tema usa a View Transitions API quando existe e cai numa troca simples quando não.
+## Personalização
 
----
+O código pode ser alterado diretamente no arquivo HTML.
 
-## Personalizando
-
-**Mudar a escala:** edite a lista `FACTORS` no script. Mais valores, mais sombras (ajuste também `NAMES` e o layout da grade).
-
-**Mudar a cor padrão:** altere `DEF` no começo do script.
-
-**Mudar o visual:** todas as cores da interface são variáveis CSS no topo do arquivo (`--bg`, `--panel`, `--ink`, `--accent`...), em `:root` para o tema claro e em `[data-theme=dark]` para o escuro.
-
----
+- `FACTORS`: define a progressão das sombras.
+- `NAMES`: define os nomes dos níveis.
+- `DEF`: define a cor inicial.
+- Variáveis CSS em `:root` e `[data-theme="dark"]`: controlam a aparência dos temas.
 
 ## Limitações
 
-- Gera sombras só escurecendo em direção ao preto. Não há versão de realces (clarear).
-- A mistura é feita em RGB. Para cores muito saturadas, as sombras mais escuras tendem ao acinzentado.
-- Precisa de internet apenas para carregar fontes e iro.js. Sem elas, o app continua funcionando com visual simplificado.
+A escala trabalha apenas com tons mais escuros, sem gerar realces. Como a mistura é feita em RGB, cores muito saturadas podem perder saturação e ficar acinzentadas nos níveis mais profundos.
 
----
+O seletor visual e as fontes externas dependem de conexão com a internet, mas o restante do aplicativo continua funcionando com as alternativas disponíveis no navegador.
 
 ## Licença
 
-Uso livre. Adapte, copie e publique como quiser.
+Uso livre. Você pode modificar, adaptar e publicar o projeto como quiser.
